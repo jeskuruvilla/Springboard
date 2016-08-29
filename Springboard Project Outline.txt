@@ -13,6 +13,4 @@ For my Capstone Project I have outlined 3 Kaggle Competitions in order of prefer
 Thanks
 
 Jes Kuruvilla
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
