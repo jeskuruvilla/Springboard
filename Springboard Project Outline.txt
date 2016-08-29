@@ -1,0 +1,18 @@
+---
+title: "My Springboard Projects"
+author: "Jes Kuruvilla"
+date: "August 28, 2016"
+output: html_document
+---
+For my Capstone Project I have outlined 3 Kaggle Competitions in order of preference:
+
+1) Yummly- Kaggle Competition
+2) San Fransisco PD - Crime Stats Analysis
+3) Airline _twitter based analysis.
+
+Thanks
+
+Jes Kuruvilla
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
