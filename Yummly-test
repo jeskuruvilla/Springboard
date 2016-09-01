@@ -1,0 +1,20 @@
+Yummly test
+require(jsonlite) ##Using JSONLITE
+library(jsonlite) ## Add library
+setwd( "~/Springboard/Yummly Stats/") ##Set Working Directory
+train <- fromJSON("train.json, flatten = TRUE")
+str(train)## Structure of dataset train
+colnames(train)## Column names of datset train
+list(train$cuisine)## Test list of Cuisine column of Train
+boxplot(train$cuisine,)
+ingred <-data.frame(train$ingredients)
+## Convert each ingredient to a column name
+## Place ingredient into individual cuisine
+## Score the vector/ cuisine as a 1 or 0
+## plot the t-SNE, Euclidean distance, plots
+##Group Individual Cusines as a vector
+## Compare Ingredient list compared to Cuisines 
+## Plot cluster maps for individual cuisines
+## Plot overlay comparison of ingredients for each cuisine vs other
+## Test this cluster map on "test" data
+## Predict final "Cuisine" attribute for each ID - to solve/ predict the cuisine
