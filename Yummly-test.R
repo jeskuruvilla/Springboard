@@ -7,7 +7,12 @@ library(ggplot2)
 library(wordcloud)## Add library
 library(qdap)
 library(tm)
+library(rpart)
+library(rattle)
 library(caret)
+library(rpart.plot)
+library(RColorBrewer)
+
 getwd()
 setwd("C:/Users/jesku/Documents/Springboard/Yummly Stats") ##Set Working Directory
 train <- fromJSON("train.json", flatten = TRUE)
@@ -15,8 +20,10 @@ str(train)## Structure of datasframe train
 class(train)
 colnames(train)## Column names of dataframe train
 list(train$cuisine)## Test list of Cuisine column of Train
+train$cuisine
 unique(train$cuisine)
 unique(head(train$ingredients))
+train$ingredients
 #Create Corpus from tm packages
 docs <- Corpus(DataframeSource(train))
 docs
@@ -64,48 +71,54 @@ writeLines(as.character(docs[[9]]))
 ###Replace errors like fused words with gsub or strreplace
 ##as eg:docs <- tm_map(docs, content_transformer(gsub), pattern = "wwwjohnshopkinsmedicineorg", replacement = "medicine")
 docs <- tm_map(docs, content_transformer(gsub), pattern = "listc", replacement = "")
+docs <- tm_map(docs, removeNumbers)
+removeBrackets <- content_transformer(function(x){gsub(pattern = "\\(|\\)|,",replacement = " ",x)})
 #Inspect lines again
 writeLines(as.character(docs[[9]]))
 
 ##Replace stems to homogenize the words
 #docs <- tm_map(docs,stemDocument)
 str(docs)
-list(docs)
 #Inspect lines again
-writeLines(as.character(docs[[127]]))
+writeLines(as.character(docs[[11]]))
 
 ##@# Document Term Matrix (DTM)#create it - Stored in corpus
-?DocumentTermMatrix
-dtm <- DocumentTermMatrix(docs)
-str(dtm)#should be a matrix
-#Inspect specific regions of the Document Term Matrix
-inspect(dtm[1:2,1000:1005])
+ingredientsMatirx <- DocumentTermMatrix(docs)
+ingredientsMatirx
 
-#@#Convert document term matrix to dataframe
-yum <- as.data.frame(dtm)
-str(yum)
-dim(yum)
+#Converting Corpus matrix into df
+ingredientsDTM <- as.data.frame(as.matrix(ingredientsMatirx))
+str(ingredientsDTM)
+
+#adding DTM back to train data frame
+train_new <- data.frame(train,ingredientsDTM) 
+
+str(train_new)
+
+
+sparse <- removeSparseTerms(ingredientsMatirx, 0.99)
+sparse
+
+#Converting Corpus matrix into df
+ingredientsDTM_Sparse <- as.data.frame(as.matrix(sparse))
+str(ingredientsDTM_Sparse)
+
+ingredientsDTM_Sparse$cuisine <- as.factor(train$cuisine)
+str(ingredientsDTM_Sparse)
+dim(ingredientsDTM_Sparse)
 
 #@#@splitting test and train
-split <- round(nrow(yum) * .70)
+split <- round(nrow(ingredientsDTM_Sparse) * .70)
 # Create train
-yumtrain <- yum[1:split, ]
+ingredientsDTM_Sparsetrain <- ingredientsDTM_Sparse[1:split, ]
 # Create test
-yumtest <- yum[(split +1): nrow(yum), ]
+ingredientsDTM_Sparsetest <- ingredientsDTM_Sparse[(split +1): nrow(ingredientsDTM_Sparse), ]
 # Fit lm model on train: model
-model <-lm(cuisine ~ ., data = yumtrain)
+model <-lm(cuisine ~ ., data = ingredientsDTM_Sparsetrain)
+
 # Predict on test: p
-p <-predict(model, yumtest)
-
-
-# Fit lm model using 10-fold CV: model
-model <- train(docs ~ ., yum,
-                     method = "lm",
-                     trControl = trainControl(
-                       method = "cv", number = 10,
-                       verboseIter = TRUE
-                     )
-)
-
+p <-predict(model, ingredientsDTM_Sparsetest)
+head(p)
+tail(p)
 
 
